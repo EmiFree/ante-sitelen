@@ -15,5 +15,19 @@ export const letterMappings = {
   a: { latin: "a", greek: "α", cyrillic: "а" },
 } as const
 
-export type Alphabet = "latin" | "greek" | "cyrillic"
-export type Letter = keyof typeof letterMappings
+// export type Alphabet = "latin" | "greek" | "cyrillic"
+// export type Letter = keyof typeof letterMappings
+
+// export type ScriptTransformer = {
+//   transformer: (input: string) => string;
+
+// }
+
+// export const SCRIPT_MAPPNIGS: Record<string, ScriptTransformer> = {
+//   "hiragana": {
+//     transformer: (input) => {
+//       input += "test";
+//       return input;
+//     }
+//   }
+// }
