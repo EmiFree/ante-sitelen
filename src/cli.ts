@@ -1,4 +1,4 @@
-import { anteSitelen } from "./ante";
+import { sitelenAnte } from "./ante";
 
 const args = process.argv.slice(2);
 const from = args.indexOf("-f");
@@ -11,4 +11,4 @@ if (from === -1 || to === -1 || input === -1) {
   process.exit(1);
 }
 
-console.log(anteSitelen(Number(args[from + 1]), Number(args[to + 1]), args[input + 1]));
+console.log(sitelenAnte(Number(args[from + 1]), Number(args[to + 1]), args[input + 1]));
