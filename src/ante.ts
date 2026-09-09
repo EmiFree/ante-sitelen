@@ -1,14 +1,21 @@
-import { kanaKeys, kanaMap, kanaToSyllable } from "./data/kana";
+import {
+  buildKanaReverse,
+  hiraganaMap,
+  katakanaMap,
+  makeKanaToLatin,
+  makeLatinToKana,
+} from "./data/kana";
 import { letterMappings } from "./data/mappings";
 
 type AlphaScript = "latin" | "greek" | "cyrillic";
-type Script = AlphaScript | "katakana";
+type Script = AlphaScript | "katakana" | "hiragana";
 
 const SCRIPT_NAMES: Record<number, Script> = {
   1: "latin",
   2: "greek",
   3: "cyrillic",
   4: "katakana",
+  5: "hiragana",
 };
 
 const reverseMap: Record<AlphaScript, Record<string, keyof typeof letterMappings>> = {
@@ -29,44 +36,22 @@ for (const [key, scripts] of Object.entries(letterMappings)) {
   }
 }
 
-function latinToKana(input: string): string {
-  let result = "";
-  let i = 0;
-  const s = input.toLowerCase();
-  while (i < s.length) {
-    const two = s.slice(i, i + 2);
-    if (kanaMap[two] !== undefined) {
-      result += kanaMap[two];
-      i += 2;
-    } else {
-      const one = s[i]!;
-      result += kanaMap[one] ?? one;
-      i++;
-    }
-  }
-  return result;
-}
+const katakanaReverse = buildKanaReverse(katakanaMap);
+const hiraganaReverse = buildKanaReverse(hiraganaMap);
 
-function kanaToLatin(input: string): string {
-  let result = "";
-  let i = 0;
-  while (i < input.length) {
-    let matched = false;
-    for (const k of kanaKeys) {
-      if (input.startsWith(k, i)) {
-        result += kanaToSyllable[k];
-        i += k.length;
-        matched = true;
-        break;
-      }
-    }
-    if (!matched) {
-      result += input[i]!;
-      i++;
-    }
-  }
-  return result;
-}
+const kanaConverters: Record<"katakana" | "hiragana", {
+  toLatin: (s: string) => string;
+  fromLatin: (s: string) => string;
+}> = {
+  katakana: {
+    toLatin: makeKanaToLatin(katakanaReverse.reverse, katakanaReverse.keys),
+    fromLatin: makeLatinToKana(katakanaMap),
+  },
+  hiragana: {
+    toLatin: makeKanaToLatin(hiraganaReverse.reverse, hiraganaReverse.keys),
+    fromLatin: makeLatinToKana(hiraganaMap),
+  },
+};
 
 function translateAlpha(from: AlphaScript, to: AlphaScript, input: string): string {
   return input
@@ -86,17 +71,22 @@ export function sitelenAnte(from: number, to: number, input: string): string {
   if (!fromScript || !toScript) return input;
 
   // Normalize kana input to Latin so the rest of the pipeline is uniform
-  const normalized = fromScript === "katakana" ? kanaToLatin(input) : input;
-  const effectiveFrom: AlphaScript = fromScript === "katakana" ? "latin" : fromScript;
+  const isKanaFrom = fromScript === "katakana" || fromScript === "hiragana";
+  const isKanaTo = toScript === "katakana" || toScript === "hiragana";
 
-  if (toScript === "katakana") {
+  const normalized = isKanaFrom
+    ? kanaConverters[fromScript as "katakana" | "hiragana"].toLatin(input)
+    : input;
+  const effectiveFrom: AlphaScript = isKanaFrom ? "latin" : (fromScript as AlphaScript);
+
+  if (isKanaTo) {
     const latin = effectiveFrom === "latin"
       ? normalized
       : translateAlpha(effectiveFrom, "latin", normalized);
-    return latinToKana(latin);
+    return kanaConverters[toScript as "katakana" | "hiragana"].fromLatin(latin);
   }
 
-  return translateAlpha(effectiveFrom, toScript, normalized);
+  return translateAlpha(effectiveFrom, toScript as AlphaScript, normalized);
 }
 
 export function tokiLukin(check: string): boolean {

@@ -7,6 +7,7 @@ const SCRIPTS = [
   { id: 2, label: 'Greek' },
   { id: 3, label: 'Cyrillic' },
   { id: 4, label: 'Katakana' },
+  { id: 5, label: 'Hiragana' },
 ]
 
 const fromScript = ref(1)
