@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import { ref } from 'vue'
+import { ref, watch } from 'vue'
 import { sitelenAnte } from '@/ante'
 
 const SCRIPTS = [
@@ -16,18 +16,17 @@ const inputText = ref('')
 const outputText = ref('')
 const copied = ref(false)
 
-function translate() {
-  outputText.value = sitelenAnte(fromScript.value, toScript.value, inputText.value)
-}
+watch([inputText, fromScript, toScript], () => {
+  outputText.value = inputText.value
+    ? sitelenAnte(fromScript.value, toScript.value, inputText.value)
+    : ''
+})
 
 function swap() {
   const tmp = fromScript.value
   fromScript.value = toScript.value
   toScript.value = tmp
-  if (outputText.value) {
-    inputText.value = outputText.value
-    outputText.value = ''
-  }
+  inputText.value = outputText.value
 }
 
 async function copyOutput() {
@@ -41,7 +40,7 @@ async function copyOutput() {
 <template>
   <main>
     <h1>sitelen ante</h1>
-    <p class="subtitle">toki pona script translator</p>
+    <p class="subtitle">translate between toki pona scripts</p>
 
     <div class="translator">
       <div class="script-selectors">
@@ -60,7 +59,7 @@ async function copyOutput() {
         <div class="panel">
           <textarea
             v-model="inputText"
-            placeholder="paste text here..."
+            placeholder="type or paste text here..."
             spellcheck="false"
           />
         </div>
@@ -84,9 +83,6 @@ async function copyOutput() {
         </div>
       </div>
 
-      <button class="translate-btn" @click="translate" :disabled="!inputText">
-        translate
-      </button>
     </div>
   </main>
 </template>
@@ -98,19 +94,24 @@ main {
   flex-direction: column;
   align-items: center;
   padding: 3rem 1rem;
-  background: #f8f9fa;
+  background: #fcf9bf;
 }
 
 h1 {
   font-size: 2rem;
   font-weight: 700;
-  color: #1a73e8;
+  color: #fff;
   margin: 0;
+  background: #AA71FF;
+  padding: 0.4rem 1.4rem;
+  border-radius: 9px;
+  border: 3px solid #000;
+  box-shadow: 0 14px 12px rgba(0,0,0, 0.35);
 }
 
 .subtitle {
   color: #5f6368;
-  margin: 0.25rem 0 2rem;
+  margin: 0.45rem 0 2rem;
   font-size: 0.95rem;
 }
 
@@ -121,6 +122,7 @@ h1 {
   border-radius: 12px;
   box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
   overflow: hidden;
+  border: 4px solid #000;
 }
 
 .script-selectors {
@@ -194,8 +196,9 @@ textarea {
   box-sizing: border-box;
 }
 
+/* output text formatting */
 textarea[readonly] {
-  color: #1a73e8;
+  color: #7a47c6;
 }
 
 .output-panel {
@@ -230,29 +233,6 @@ textarea[readonly] {
   color: #34a853;
 }
 
-.translate-btn {
-  display: block;
-  width: calc(100% - 2.5rem);
-  margin: 1rem 1.25rem;
-  padding: 0.75rem;
-  background: #1a73e8;
-  color: #fff;
-  border: none;
-  border-radius: 6px;
-  font-size: 1rem;
-  font-weight: 500;
-  cursor: pointer;
-  transition: background 0.15s;
-}
-
-.translate-btn:hover:not(:disabled) {
-  background: #1557b0;
-}
-
-.translate-btn:disabled {
-  background: #c5d9f8;
-  cursor: default;
-}
 
 @media (max-width: 600px) {
   .text-panels {

@@ -89,6 +89,7 @@ export function sitelenAnte(from: number, to: number, input: string): string {
   return translateAlpha(effectiveFrom, toScript as AlphaScript, normalized);
 }
 
-export function tokiLukin(check: string): boolean {
+//TODO: implement this later lol
+// export function tokiLukin(check: string): boolean {
 
-}
+// }
