@@ -1,5 +1,5 @@
 import { describe, it, expect } from "vitest";
-import { sitelenAnte } from "./src/ante";
+import { sitelenAnte } from "./ante";
 
 describe("sitelenAnte", () => {
   it("translates latin to greek", () => {
