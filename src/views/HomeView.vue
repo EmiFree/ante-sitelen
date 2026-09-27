@@ -1,14 +1,39 @@
 <script setup lang="ts">
-import { ref, watch } from 'vue'
+import { ref, watch, computed } from 'vue'
 import { sitelenAnte } from '@/ante'
 
-const SCRIPTS = [
-  { id: 1, label: 'Latin' },
-  { id: 2, label: 'Greek' },
-  { id: 3, label: 'Cyrillic' },
-  { id: 4, label: 'Katakana' },
-  { id: 5, label: 'Hiragana' },
-]
+const locale = ref<'en' | 'tok'>('en')
+
+const messages = {
+  en: {
+    title: 'sitelen ante',
+    subtitle: 'Translate between toki pona scripts',
+    inputPlaceholder: 'type or paste text here...',
+    outputPlaceholder: 'translation will appear here...',
+    swapTitle: 'Swap scripts',
+    copyTitle: 'Copy to clipboard',
+    copy: 'copy',
+    copied: 'copied!',
+    scripts: ['Latin', 'Greek', 'Cyrillic', 'Katakana', 'Hiragana'],
+  },
+  tok: {
+    title: 'sitelen ante',
+    subtitle: 'o ante e nasin sitelen pi toki pona',
+    inputPlaceholder: 'o pana li sitelen',
+    outputPlaceholder: 'toki ante li kama lon ni  ',
+    swapTitle: 'ante lon',
+    copyTitle: 'pali e sama',
+    copy: 'pali e sama',
+    copied: 'pini!',
+    scripts: ['lasina', 'elina', 'kililisa', 'katakana', 'ilakana'],
+  },
+}
+
+const t = computed(() => messages[locale.value])
+
+const SCRIPTS = computed(() =>
+  [1, 2, 3, 4, 5].map((id, i) => ({ id, label: t.value.scripts[i] }))
+)
 
 const fromScript = ref(1)
 const toScript = ref(2)
@@ -39,8 +64,15 @@ async function copyOutput() {
 
 <template>
   <main>
-    <h1>sitelen ante</h1>
-    <p class="subtitle">translate between toki pona scripts</p>
+    <div class="lang-selector">
+      <select v-model="locale">
+        <option value="en">English</option>
+        <option value="tok">toki pona</option>
+      </select>
+    </div>
+
+    <h1>{{ t.title }}</h1>
+    <p class="subtitle">{{ t.subtitle }}</p>
 
     <div class="translator">
       <div class="script-selectors">
@@ -48,7 +80,7 @@ async function copyOutput() {
           <option v-for="s in SCRIPTS" :key="s.id" :value="s.id">{{ s.label }}</option>
         </select>
 
-        <button class="swap-btn" @click="swap" title="Swap scripts">⇄</button>
+        <button class="swap-btn" @click="swap" :title="t.swapTitle">⇄</button>
 
         <select v-model="toScript">
           <option v-for="s in SCRIPTS" :key="s.id" :value="s.id">{{ s.label }}</option>
@@ -59,7 +91,7 @@ async function copyOutput() {
         <div class="panel">
           <textarea
             v-model="inputText"
-            placeholder="type or paste text here..."
+            :placeholder="t.inputPlaceholder"
             spellcheck="false"
           />
         </div>
@@ -67,7 +99,7 @@ async function copyOutput() {
         <div class="panel output-panel">
           <textarea
             :value="outputText"
-            placeholder="translation will appear here..."
+            :placeholder="t.outputPlaceholder"
             readonly
             spellcheck="false"
           />
@@ -76,9 +108,9 @@ async function copyOutput() {
             :class="{ copied }"
             @click="copyOutput"
             :disabled="!outputText"
-            title="Copy to clipboard"
+            :title="t.copyTitle"
           >
-            {{ copied ? 'copied!' : 'copy' }}
+            {{ copied ? t.copied : t.copy }}
           </button>
         </div>
       </div>
@@ -94,7 +126,24 @@ main {
   flex-direction: column;
   align-items: center;
   padding: 3rem 1rem;
-  background: #fcf9bf;
+  background: #edd697;
+  position: relative;
+}
+
+.lang-selector {
+  position: absolute;
+  top: 1rem;
+  right: 1rem;
+}
+
+.lang-selector select {
+  padding: 0.3rem 0.6rem;
+  border: 2px solid #000;
+  border-radius: 6px;
+  font-size: 0.85rem;
+  background: #fff;
+  cursor: pointer;
+  outline: none;
 }
 
 h1 {
@@ -118,9 +167,9 @@ h1 {
 .translator {
   width: 100%;
   max-width: 860px;
-  background: #fff;
+  background: #fcf3db;
   border-radius: 12px;
-  box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
+  box-shadow: 0 14px 10px rgba(0, 0, 0, 0.3);
   overflow: hidden;
   border: 4px solid #000;
 }
@@ -136,33 +185,41 @@ h1 {
 select {
   flex: 1;
   padding: 0.5rem 0.75rem;
-  border: 1px solid #dadce0;
-  border-radius: 6px;
+  border: 2px solid #000;
+  border-radius: 9px;
   font-size: 0.95rem;
   color: #202124;
-  background: #fff;
+  background: #ffd;
   cursor: pointer;
   outline: none;
 }
 
 select:focus {
-  border-color: #1a73e8;
-  box-shadow: 0 0 0 2px rgba(26, 115, 232, 0.2);
+  border-color: #000;
+  box-shadow: 0 0 0 2px rgba(0, 0, 0, 0.15);
 }
 
 .swap-btn {
   padding: 0.5rem 0.75rem;
-  background: none;
-  border: 1px solid #dadce0;
-  border-radius: 6px;
+  background: #AA71FF;
+  border: 2px solid #000;
+  border-radius: 9px;
   font-size: 1.1rem;
   cursor: pointer;
-  color: #5f6368;
-  transition: background 0.15s;
+  color: #fff;
+  font-weight: 700;
+  box-shadow: 0 3px 0 #000;
+  transform: translateY(0);
+  transition: background 0.1s, box-shadow 0.1s, transform 0.1s;
 }
 
 .swap-btn:hover {
-  background: #f1f3f4;
+  background: #9558ee;
+}
+
+.swap-btn:active {
+  box-shadow: 0 1px 0 #000;
+  transform: translateY(2px);
 }
 
 .text-panels {
@@ -210,17 +267,27 @@ textarea[readonly] {
   bottom: 0.75rem;
   right: 0.75rem;
   padding: 0.35rem 0.85rem;
-  background: #fff;
-  border: 1px solid #dadce0;
-  border-radius: 6px;
+  min-width: 5rem;
+  text-align: center;
+  background: #AA71FF;
+  border: 2px solid #000;
+  border-radius: 9px;
   font-size: 0.85rem;
   cursor: pointer;
-  color: #5f6368;
-  transition: all 0.15s;
+  color: #fff;
+  font-weight: 700;
+  box-shadow: 0 3px 0 #000;
+  transform: translateY(0);
+  transition: background 0.1s, box-shadow 0.1s, transform 0.1s;
 }
 
-.copy-btn:hover:not(:disabled) {
-  background: #f1f3f4;
+.copy-btn:hover:not(:disabled):not(.copied) {
+  background: #9558ee;
+}
+
+.copy-btn:active:not(:disabled) {
+  box-shadow: 0 1px 0 #000;
+  transform: translateY(2px);
 }
 
 .copy-btn:disabled {
@@ -229,8 +296,8 @@ textarea[readonly] {
 }
 
 .copy-btn.copied {
-  border-color: #34a853;
-  color: #34a853;
+  background: #34a853;
+  border-color: #000;
 }
 
 
