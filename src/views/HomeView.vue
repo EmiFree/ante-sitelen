@@ -2,12 +2,12 @@
 import { ref, watch, computed } from 'vue'
 import { sitelenAnte } from '@/ante'
 
-const locale = ref<'en' | 'tok'>('en')
+const locale = ref<'en' | 'tok' | 'es' | 'jp'>('en')
 
 const messages = {
   en: {
     title: 'sitelen ante',
-    subtitle: 'Translate between toki pona scripts',
+    subtitle: 'Convert toki pona scripts',
     inputPlaceholder: 'Type or paste text here...',
     outputPlaceholder: 'Translation will appear here...',
     swapTitle: 'Swap scripts',
@@ -29,14 +29,25 @@ const messages = {
   },
   es: {
     title: 'sitelen ante',
-    subtitle: 'Traducir entre alfabetos en toki pona ',
-    inputPlaceholder: 'o pana e sitelen',
-    outputPlaceholder: 'toki ante li kama lon',
-    swapTitle: 'ante lon',
-    copyTitle: 'o kama jo e ni',
-    copy: 'o kama jo e ni',
-    copied: 'pini!',
-    scripts: ['Lasina', 'Elina', 'Kililisa', 'Katakana', 'Ilakana'],
+    subtitle: 'Convertir entre escrituras de toki pona',
+    inputPlaceholder: 'Escribe o pega el texto aquí',
+    outputPlaceholder: 'La traducción aparecerá aquí',
+    swapTitle: 'Invertir escrituras',
+    copyTitle: 'Copiar',
+    copy: 'Copiar',
+    copied: '¡Copiado!',
+    scripts: ['Latino', 'Greigo', 'Cirílico', 'Katakana', 'Hiragana'],
+  },
+  jp: {
+    title: 'してれん　あんて',
+    subtitle: 'トキポナの文字体系を相互に変換',
+    inputPlaceholder: 'ここにテキストを入力または貼り付け...',
+    outputPlaceholder: '変換結果がここに表示されます...',
+    swapTitle: '文字体系を入れ替え',
+    copyTitle: 'クリップボードにコピー',
+    copy: 'コピー',
+    copied: 'コピーしました！',
+    scripts: ['ラテン文字', 'ギリシャ文字', 'キリル文字', 'カタカナ', 'ひらがな'],
   }
 }
 
@@ -79,6 +90,8 @@ async function copyOutput() {
       <select v-model="locale">
         <option value="en">English</option>
         <option value="tok">toki pona</option>
+        <option value="es">Español</option>
+        <option value="jp">日本語</option>
       </select>
     </div>
 
