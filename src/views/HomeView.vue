@@ -27,6 +27,17 @@ const messages = {
     copied: 'pini!',
     scripts: ['Lasina', 'Elina', 'Kililisa', 'Katakana', 'Ilakana'],
   },
+  es: {
+    title: 'sitelen ante',
+    subtitle: 'Traducir entre alfabetos en toki pona ',
+    inputPlaceholder: 'o pana e sitelen',
+    outputPlaceholder: 'toki ante li kama lon',
+    swapTitle: 'ante lon',
+    copyTitle: 'o kama jo e ni',
+    copy: 'o kama jo e ni',
+    copied: 'pini!',
+    scripts: ['Lasina', 'Elina', 'Kililisa', 'Katakana', 'Ilakana'],
+  }
 }
 
 const t = computed(() => messages[locale.value])
