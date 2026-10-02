@@ -77,6 +77,19 @@ export const katakanaMap: KanaMap = {
   n: "ン",
 };
 
+const DAKUTEN_MAP: Record<string, string> = {
+  ハ: "パ", ヒ: "ピ", フ: "プ", ヘ: "ペ", ホ: "ポ",
+  は: "ぱ", ひ: "ぴ", ふ: "ぷ", へ: "ぺ", ほ: "ぽ",
+};
+
+export function addDakuten(input: string): string {
+  let result = "";
+  for (const ch of input) {
+    result += DAKUTEN_MAP[ch] ?? ch;
+  }
+  return result;
+}
+
 export const hiraganaMap: KanaMap = {
   a: "あ", i: "い", u: "う", e: "え", o: "お",
   ka: "か", ki: "き", ku: "く", ke: "け", ko: "こ",

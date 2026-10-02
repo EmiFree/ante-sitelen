@@ -15,6 +15,8 @@ const messages = {
     copy: 'Copy',
     copied: 'Copied!',
     scripts: ['Latin', 'Greek', 'Cyrillic', 'Katakana', 'Hiragana'],
+    jaPunctuation: 'Japanese punctuation',
+    dakuten: 'Dakuten / handakuten',
   },
   tok: {
     title: 'sitelen ante',
@@ -26,6 +28,8 @@ const messages = {
     copy: 'o kama jo e ni',
     copied: 'pini!',
     scripts: ['Lasina', 'Elina', 'Kililisa', 'Katakana', 'Ilakana'],
+    jaPunctuation: 'sitelen lili pi toki Nijon',
+    dakuten: 'sitelen pi kalama ante',
   },
   es: {
     title: 'sitelen ante',
@@ -37,6 +41,8 @@ const messages = {
     copy: 'Copiar',
     copied: '¡Copiado!',
     scripts: ['Latino', 'Greigo', 'Cirílico', 'Katakana', 'Hiragana'],
+    jaPunctuation: 'Puntuación japonesa',
+    dakuten: 'Dakuten / handakuten',
   },
   jp: {
     title: 'してれん　あんて',
@@ -48,6 +54,8 @@ const messages = {
     copy: 'コピー',
     copied: 'コピーしました！',
     scripts: ['ラテン文字', 'ギリシャ文字', 'キリル文字', 'カタカナ', 'ひらがな'],
+    jaPunctuation: '日本語の句読点',
+    dakuten: '濁点・半濁点',
   }
 }
 
@@ -62,10 +70,19 @@ const toScript = ref(2)
 const inputText = ref('')
 const outputText = ref('')
 const copied = ref(false)
+const japanesePunctuation = ref(false)
+const dakuten = ref(false)
 
-watch([inputText, fromScript, toScript], () => {
+const kanaInvolved = computed(
+  () => fromScript.value === 4 || fromScript.value === 5 || toScript.value === 4 || toScript.value === 5,
+)
+
+watch([inputText, fromScript, toScript, japanesePunctuation, dakuten], () => {
   outputText.value = inputText.value
-    ? sitelenAnte(fromScript.value, toScript.value, inputText.value)
+    ? sitelenAnte(fromScript.value, toScript.value, inputText.value, {
+        japanesePunctuation: japanesePunctuation.value,
+        dakuten: dakuten.value,
+      })
     : ''
 })
 
@@ -109,6 +126,17 @@ async function copyOutput() {
         <select v-model="toScript">
           <option v-for="s in SCRIPTS" :key="s.id" :value="s.id">{{ s.label }}</option>
         </select>
+      </div>
+
+      <div v-if="kanaInvolved" class="kana-options">
+        <label class="ja-punct-toggle">
+          <input type="checkbox" v-model="japanesePunctuation" />
+          <span>{{ t.jaPunctuation }}</span>
+        </label>
+        <label class="ja-punct-toggle">
+          <input type="checkbox" v-model="dakuten" />
+          <span>{{ t.dakuten }}</span>
+        </label>
       </div>
 
       <div class="text-panels">
@@ -246,6 +274,62 @@ select:focus {
   transform: translateY(2px);
 }
 
+.kana-options {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.25rem 1.5rem;
+  padding: 0.75rem 1.25rem;
+  border-bottom: 1px solid #e8eaed;
+}
+
+.ja-punct-toggle {
+  display: flex;
+  align-items: center;
+  gap: 0.6rem;
+  font-size: 0.9rem;
+  color: #202124;
+  cursor: pointer;
+  user-select: none;
+}
+
+.ja-punct-toggle input {
+  appearance: none;
+  -webkit-appearance: none;
+  width: 1.15rem;
+  height: 1.15rem;
+  margin: 0 0 3px 0;
+  background: #fff;
+  border: 2px solid #000;
+  border-radius: 6px;
+  box-shadow: 0 3px 0 #000;
+  cursor: pointer;
+  position: relative;
+  transform: translateY(0);
+  transition: background 0.1s, box-shadow 0.1s, transform 0.1s;
+}
+
+.ja-punct-toggle input:checked {
+  background: #AA71FF;
+}
+
+.ja-punct-toggle input:checked::after {
+  content: "✓";
+  position: absolute;
+  inset: 0;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: #fff;
+  font-size: 0.85rem;
+  font-weight: 900;
+  line-height: 1;
+}
+
+.ja-punct-toggle input:active {
+  box-shadow: 0 1px 0 #000;
+  transform: translateY(2px);
+}
+
 .text-panels {
   display: grid;
   grid-template-columns: 1fr 1fr;
@@ -326,6 +410,10 @@ textarea[readonly] {
 
 
 @media (max-width: 600px) {
+  main {
+    padding-top: 4.5rem;
+  }
+
   .text-panels {
     grid-template-columns: 1fr;
   }

@@ -1,4 +1,5 @@
 import {
+  addDakuten,
   buildKanaReverse,
   hiraganaMap,
   katakanaMap,
@@ -6,6 +7,7 @@ import {
   makeLatinToKana,
 } from "./data/kana";
 import { letterMappings } from "./data/mappings";
+import { fromJapanesePunctuation, toJapanesePunctuation } from "./data/punctuation";
 
 type AlphaScript = "latin" | "greek" | "cyrillic";
 type Script = AlphaScript | "katakana" | "hiragana";
@@ -65,7 +67,12 @@ function translateAlpha(from: AlphaScript, to: AlphaScript, input: string): stri
     .join("");
 }
 
-export function sitelenAnte(from: number, to: number, input: string): string {
+export function sitelenAnte(
+  from: number,
+  to: number,
+  input: string,
+  options: { japanesePunctuation?: boolean; dakuten?: boolean } = {},
+): string {
   const fromScript = SCRIPT_NAMES[from];
   const toScript = SCRIPT_NAMES[to];
   if (!fromScript || !toScript) return input;
@@ -74,19 +81,29 @@ export function sitelenAnte(from: number, to: number, input: string): string {
   const isKanaFrom = fromScript === "katakana" || fromScript === "hiragana";
   const isKanaTo = toScript === "katakana" || toScript === "hiragana";
 
-  const normalized = isKanaFrom
-    ? kanaConverters[fromScript as "katakana" | "hiragana"].toLatin(input)
+  const pre = options.japanesePunctuation && isKanaFrom
+    ? fromJapanesePunctuation(input)
     : input;
+
+  const normalized = isKanaFrom
+    ? kanaConverters[fromScript as "katakana" | "hiragana"].toLatin(pre)
+    : pre;
   const effectiveFrom: AlphaScript = isKanaFrom ? "latin" : (fromScript as AlphaScript);
 
+  let output: string;
   if (isKanaTo) {
     const latin = effectiveFrom === "latin"
       ? normalized
       : translateAlpha(effectiveFrom, "latin", normalized);
-    return kanaConverters[toScript as "katakana" | "hiragana"].fromLatin(latin);
+    output = kanaConverters[toScript as "katakana" | "hiragana"].fromLatin(latin);
+  } else {
+    output = translateAlpha(effectiveFrom, toScript as AlphaScript, normalized);
   }
 
-  return translateAlpha(effectiveFrom, toScript as AlphaScript, normalized);
+  let final = output;
+  if (options.japanesePunctuation && isKanaTo) final = toJapanesePunctuation(final);
+  if (options.dakuten && isKanaTo) final = addDakuten(final);
+  return final;
 }
 
 //TODO: implement this later lol
