@@ -128,16 +128,10 @@ async function copyOutput() {
         </select>
       </div>
 
-      <div v-if="kanaInvolved" class="kana-options">
-        <label class="ja-punct-toggle">
-          <input type="checkbox" v-model="japanesePunctuation" />
-          <span>{{ t.jaPunctuation }}</span>
-        </label>
-        <label class="ja-punct-toggle">
-          <input type="checkbox" v-model="dakuten" />
-          <span>{{ t.dakuten }}</span>
-        </label>
-      </div>
+      <label v-if="kanaInvolved" class="ja-punct-toggle">
+        <input type="checkbox" v-model="japanesePunctuation" />
+        <span>{{ t.jaPunctuation }}</span>
+      </label>
 
       <div class="text-panels">
         <div class="panel">
@@ -178,7 +172,7 @@ main {
   flex-direction: column;
   align-items: center;
   padding: 3rem 1rem;
-  background: #edd697;
+  background: #fdc85d;
   position: relative;
 }
 
@@ -274,20 +268,14 @@ select:focus {
   transform: translateY(2px);
 }
 
-.kana-options {
-  display: flex;
-  flex-wrap: wrap;
-  gap: 0.25rem 1.5rem;
-  padding: 0.75rem 1.25rem;
-  border-bottom: 1px solid #e8eaed;
-}
-
 .ja-punct-toggle {
   display: flex;
   align-items: center;
   gap: 0.6rem;
+  padding: 0.75rem 1.25rem;
   font-size: 0.9rem;
   color: #202124;
+  border-bottom: 1px solid #e8eaed;
   cursor: pointer;
   user-select: none;
 }
