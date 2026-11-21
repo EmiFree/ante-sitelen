@@ -16,7 +16,7 @@ const messages = {
     copied: 'Copied!',
     scripts: ['Latin', 'Greek', 'Cyrillic', 'Katakana', 'Hiragana'],
     jaPunctuation: 'Japanese punctuation',
-    dakuten: 'Dakuten / handakuten',
+    dakuten: 'Dakuten',
     iotatedVowels: 'Iotated vowels (я, е, ё, ю)',
   },
   tok: {
@@ -44,11 +44,11 @@ const messages = {
     copied: '¡Copiado!',
     scripts: ['Latino', 'Greigo', 'Cirílico', 'Katakana', 'Hiragana'],
     jaPunctuation: 'Puntuación japonesa',
-    dakuten: 'Dakuten / handakuten',
+    dakuten: 'Dakuten',
     iotatedVowels: 'Vocales iotadas (я, е, ё, ю)',
   },
   jp: {
-    title: 'してれん　あんて',
+    title: 'シテレン アンテ',
     subtitle: 'トキポナの文字体系を相互に変換',
     inputPlaceholder: 'ここにテキストを入力または貼り付け...',
     outputPlaceholder: '変換結果がここに表示されます...',
@@ -82,7 +82,8 @@ const kanaInvolved = computed(
   () => fromScript.value === 4 || fromScript.value === 5 || toScript.value === 4 || toScript.value === 5,
 )
 
-const cyrillicInvolved = computed(() => fromScript.value === 3 || toScript.value === 3)
+// Iotated input is auto-detected, so the toggle only controls Cyrillic output
+const cyrillicTarget = computed(() => toScript.value === 3)
 
 watch([inputText, fromScript, toScript, japanesePunctuation, dakuten, iotatedVowels], () => {
   outputText.value = inputText.value
@@ -136,7 +137,7 @@ async function copyOutput() {
         </select>
       </div>
 
-      <div v-if="kanaInvolved || cyrillicInvolved" class="kana-options">
+      <div v-if="kanaInvolved || cyrillicTarget" class="kana-options">
         <template v-if="kanaInvolved">
           <label class="ja-punct-toggle">
             <input type="checkbox" v-model="japanesePunctuation" />
@@ -147,7 +148,7 @@ async function copyOutput() {
             <span>{{ t.dakuten }}</span>
           </label>
         </template>
-        <label v-if="cyrillicInvolved" class="ja-punct-toggle">
+        <label v-if="cyrillicTarget" class="ja-punct-toggle">
           <input type="checkbox" v-model="iotatedVowels" />
           <span>{{ t.iotatedVowels }}</span>
         </label>

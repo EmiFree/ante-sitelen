@@ -84,7 +84,7 @@ export function sitelenAnte(
 
   let pre = input;
   if (options.japanesePunctuation && isKanaFrom) pre = fromJapanesePunctuation(pre);
-  if (options.iotatedVowels && fromScript === "cyrillic") pre = fromIotatedVowels(pre);
+  if (fromScript === "cyrillic") pre = fromIotatedVowels(pre);
 
   const normalized = isKanaFrom
     ? kanaConverters[fromScript as "katakana" | "hiragana"].toLatin(pre)

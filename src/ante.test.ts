@@ -58,8 +58,22 @@ describe("sitelenAnte", () => {
     it("leaves j + vowel when flag is off", () => {
       expect(sitelenAnte(1, 3, "jan", { iotatedVowels: false })).toBe("jан");
     });
-    it("reads iotated letters back as j-syllables", () => {
-      expect(sitelenAnte(3, 1, "ян ело ёпа юпа єн", { iotatedVowels: true })).toBe("jan jelo jopa jupa jen");
+    it("auto-detects iotated letters in Cyrillic input without the flag", () => {
+      expect(sitelenAnte(3, 1, "ян ело ёпа юпа єн")).toBe("jan jelo jopa jupa jen");
+    });
+    it("reads е after a vowel as je and after a consonant as e", () => {
+      expect(sitelenAnte(3, 1, "мие")).toBe("mije");
+      expect(sitelenAnte(3, 1, "тело")).toBe("telo");
+    });
+    it("reads word-initial е from the rest of the text", () => {
+      expect(sitelenAnte(3, 1, "ело")).toBe("elo");
+      expect(sitelenAnte(3, 1, "э ело")).toBe("e jelo");
+      expect(sitelenAnte(3, 1, "jан ело")).toBe("jan elo");
+    });
+    it("round-trips iotated output back to Latin", () => {
+      const cyr = sitelenAnte(1, 3, "mi jan pona e jelo mije", { iotatedVowels: true });
+      expect(cyr).toBe("ми ян пона э ело мие");
+      expect(sitelenAnte(3, 1, cyr)).toBe("mi jan pona e jelo mije");
     });
     it("works from kana and greek sources", () => {
       expect(sitelenAnte(4, 3, "ヤン", { iotatedVowels: true })).toBe("ян");
