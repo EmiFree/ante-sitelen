@@ -7,7 +7,7 @@ export const letterMappings = {
   s: { latin: "s", greek: "σ", cyrillic: "с" },
   w: { latin: "w", greek: "β", cyrillic: ["в", "ў"] },
   l: { latin: "l", greek: "λ", cyrillic: "л" },
-  j: { latin: "j", greek: "γ", cyrillic: ["й", "j"] },
+  j: { latin: "j", greek: "γ", cyrillic: ["j", "й"] },
   i: { latin: "i", greek: "ι", cyrillic: ["и", "і"] },
   u: { latin: "u", greek: "υ", cyrillic: "у" },
   e: { latin: "e", greek: "ε", cyrillic: ["э", "е"] },

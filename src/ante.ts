@@ -6,6 +6,7 @@ import {
   makeKanaToLatin,
   makeLatinToKana,
 } from "./data/kana";
+import { fromIotatedVowels, toIotatedVowels } from "./data/iotation";
 import { letterMappings } from "./data/mappings";
 import { fromJapanesePunctuation, toJapanesePunctuation } from "./data/punctuation";
 
@@ -71,7 +72,7 @@ export function sitelenAnte(
   from: number,
   to: number,
   input: string,
-  options: { japanesePunctuation?: boolean; dakuten?: boolean } = {},
+  options: { japanesePunctuation?: boolean; dakuten?: boolean; iotatedVowels?: boolean } = {},
 ): string {
   const fromScript = SCRIPT_NAMES[from];
   const toScript = SCRIPT_NAMES[to];
@@ -81,9 +82,9 @@ export function sitelenAnte(
   const isKanaFrom = fromScript === "katakana" || fromScript === "hiragana";
   const isKanaTo = toScript === "katakana" || toScript === "hiragana";
 
-  const pre = options.japanesePunctuation && isKanaFrom
-    ? fromJapanesePunctuation(input)
-    : input;
+  let pre = input;
+  if (options.japanesePunctuation && isKanaFrom) pre = fromJapanesePunctuation(pre);
+  if (options.iotatedVowels && fromScript === "cyrillic") pre = fromIotatedVowels(pre);
 
   const normalized = isKanaFrom
     ? kanaConverters[fromScript as "katakana" | "hiragana"].toLatin(pre)
@@ -103,6 +104,7 @@ export function sitelenAnte(
   let final = output;
   if (options.japanesePunctuation && isKanaTo) final = toJapanesePunctuation(final);
   if (options.dakuten && isKanaTo) final = addDakuten(final);
+  if (options.iotatedVowels && toScript === "cyrillic") final = toIotatedVowels(final);
   return final;
 }
 

@@ -17,6 +17,7 @@ const messages = {
     scripts: ['Latin', 'Greek', 'Cyrillic', 'Katakana', 'Hiragana'],
     jaPunctuation: 'Japanese punctuation',
     dakuten: 'Dakuten / handakuten',
+    iotatedVowels: 'Iotated vowels (я, е, ё, ю)',
   },
   tok: {
     title: 'sitelen ante',
@@ -30,6 +31,7 @@ const messages = {
     scripts: ['Lasina', 'Elina', 'Kililisa', 'Katakana', 'Ilakana'],
     jaPunctuation: 'sitelen lili pi toki Nijon',
     dakuten: 'sitelen pi kalama ante',
+    iotatedVowels: 'sitelen pi kalama j (я, е, ё, ю)',
   },
   es: {
     title: 'sitelen ante',
@@ -43,6 +45,7 @@ const messages = {
     scripts: ['Latino', 'Greigo', 'Cirílico', 'Katakana', 'Hiragana'],
     jaPunctuation: 'Puntuación japonesa',
     dakuten: 'Dakuten / handakuten',
+    iotatedVowels: 'Vocales iotadas (я, е, ё, ю)',
   },
   jp: {
     title: 'してれん　あんて',
@@ -56,6 +59,7 @@ const messages = {
     scripts: ['ラテン文字', 'ギリシャ文字', 'キリル文字', 'カタカナ', 'ひらがな'],
     jaPunctuation: '日本語の句読点',
     dakuten: '濁点・半濁点',
+    iotatedVowels: 'ヨット化母音（я, е, ё, ю）',
   }
 }
 
@@ -72,16 +76,20 @@ const outputText = ref('')
 const copied = ref(false)
 const japanesePunctuation = ref(false)
 const dakuten = ref(false)
+const iotatedVowels = ref(false)
 
 const kanaInvolved = computed(
   () => fromScript.value === 4 || fromScript.value === 5 || toScript.value === 4 || toScript.value === 5,
 )
 
-watch([inputText, fromScript, toScript, japanesePunctuation, dakuten], () => {
+const cyrillicInvolved = computed(() => fromScript.value === 3 || toScript.value === 3)
+
+watch([inputText, fromScript, toScript, japanesePunctuation, dakuten, iotatedVowels], () => {
   outputText.value = inputText.value
     ? sitelenAnte(fromScript.value, toScript.value, inputText.value, {
         japanesePunctuation: japanesePunctuation.value,
         dakuten: dakuten.value,
+        iotatedVowels: iotatedVowels.value,
       })
     : ''
 })
@@ -128,10 +136,22 @@ async function copyOutput() {
         </select>
       </div>
 
-      <label v-if="kanaInvolved" class="ja-punct-toggle">
-        <input type="checkbox" v-model="japanesePunctuation" />
-        <span>{{ t.jaPunctuation }}</span>
-      </label>
+      <div v-if="kanaInvolved || cyrillicInvolved" class="kana-options">
+        <template v-if="kanaInvolved">
+          <label class="ja-punct-toggle">
+            <input type="checkbox" v-model="japanesePunctuation" />
+            <span>{{ t.jaPunctuation }}</span>
+          </label>
+          <label class="ja-punct-toggle">
+            <input type="checkbox" v-model="dakuten" />
+            <span>{{ t.dakuten }}</span>
+          </label>
+        </template>
+        <label v-if="cyrillicInvolved" class="ja-punct-toggle">
+          <input type="checkbox" v-model="iotatedVowels" />
+          <span>{{ t.iotatedVowels }}</span>
+        </label>
+      </div>
 
       <div class="text-panels">
         <div class="panel">
@@ -268,14 +288,20 @@ select:focus {
   transform: translateY(2px);
 }
 
+.kana-options {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.25rem 1.5rem;
+  padding: 0.75rem 1.25rem;
+  border-bottom: 1px solid #e8eaed;
+}
+
 .ja-punct-toggle {
   display: flex;
   align-items: center;
   gap: 0.6rem;
-  padding: 0.75rem 1.25rem;
   font-size: 0.9rem;
   color: #202124;
-  border-bottom: 1px solid #e8eaed;
   cursor: pointer;
   user-select: none;
 }
